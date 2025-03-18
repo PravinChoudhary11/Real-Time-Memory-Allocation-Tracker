@@ -3,8 +3,12 @@
 
 #include "FirstFitAllocator.h"
 #include <queue>
+#include <chrono>
 #include <iostream>
-#include <windows.h> // For Sleep function
+#include <thread> // Ensure this is included for std::this_thread
+using namespace std;
+
+// Removed invalid namespace usage
 
 // Structure representing a real-time task
 struct RealTimeTask {
@@ -36,26 +40,14 @@ public:
             tasks.pop();
             std::cout << "Processing Task " << task.id 
                       << " requiring " << task.memoryRequired << " bytes\n";
-            
             MemoryBlock* block = allocator.allocate(task.memoryRequired);
             if(block) {
                 std::cout << "Task " << task.id << " allocated block at address " 
                           << block->start << " of size " << block->size << "\n";
-                
-                // After allocating, display the memory map
-                std::cout << "Memory after allocation:\n";
-                allocator.displayMemoryMap();
-                
-                // Simulate task execution delay with Windows Sleep (milliseconds)
-                Sleep(500);
-                
-                // Deallocate the memory block
+                // Simulate task execution delay (e.g., 500 milliseconds)
+                std::this_thread::sleep_for(std::chrono::milliseconds(500));
                 allocator.deallocate(block);
                 std::cout << "Task " << task.id << " deallocated memory\n";
-                
-                // After deallocating, display the memory map
-                std::cout << "Memory after deallocation:\n";
-                allocator.displayMemoryMap();
             } else {
                 std::cout << "Task " << task.id << " failed to allocate memory!\n";
             }

@@ -1,0 +1,74 @@
+CHANGELOG for Real-Time Memory Allocation System Project
+===========================================================
+
+Version 1.0 - [Date]
+--------------------
+- Project Setup:
+  - Created the initial project structure with a "src" folder.
+  - Set up Git repository and basic build configuration (via Makefile/CMake).
+
+- Memory Allocation Module:
+  - Developed the MemoryAllocator base class that manages a list of memory blocks.
+  - Implemented the FirstFitAllocator class that:
+      * Allocates memory using the First Fit strategy.
+      * Splits memory blocks when part of a free block is allocated.
+      * Merges adjacent free blocks on deallocation.
+
+- Task Simulator Module:
+  - Created a RealTimeTask structure representing tasks with an ID, memory requirement, and deadline.
+  - Built the TaskSimulator class to:
+      * Enqueue tasks.
+      * Process each task by allocating memory, simulating execution (using std::this_thread::sleep_for), and deallocating memory.
+      * Log events during allocation, deallocation, and display memory map states.
+
+- Logging & Testing:
+  - Added console output to display:
+      * Initial memory state.
+      * Memory state after each allocation and deallocation.
+      * Task processing steps and final memory state.
+  - Tested to ensure that:
+      * Memory is correctly allocated and freed.
+      * Free blocks are merged after deallocation.
+      * Overall output meets expected behavior.
+
+- Final Output:
+  - Confirmed that the program produces the expected log output:
+    Starting TaskSimulator test program...
+    Creating allocator with 1000 bytes...
+    Initial memory state:
+    Memory Map:
+    Block at 0 - 999 (1000 bytes): Free
+    Creating simulator...
+    Adding tasks...
+    Processing tasks...
+    Processing Task 1 requiring 200 bytes
+    Task 1 allocated block at address 0 of size 200
+    Memory after allocation:
+    Memory Map:
+    Block at 0 - 199 (200 bytes): Allocated
+    Block at 200 - 999 (800 bytes): Free
+    Task 1 deallocated memory
+    Memory after deallocation:
+    Memory Map:
+    Block at 0 - 999 (1000 bytes): Free
+    Processing Task 2 requiring 300 bytes
+    Task 2 allocated block at address 0 of size 300
+    Memory after allocation:
+    Memory Map:
+    Block at 0 - 299 (300 bytes): Allocated
+    Block at 300 - 999 (700 bytes): Free
+    Task 2 deallocated memory
+    Memory after deallocation:
+    Memory Map:
+    Block at 0 - 999 (1000 bytes): Free
+    Final memory state:
+    Memory Map:
+    Block at 0 - 999 (1000 bytes): Free
+    All tasks processed successfully.
+    Program finished. Press Enter to exit...
+
+Future Enhancements:
+--------------------
+- Implement additional memory allocation strategies (e.g., Best Fit, Buddy System).
+- Enhance the task scheduler to support real-time deadline management.
+- Develop a graphical user interface for visualizing memory usage in real time.
