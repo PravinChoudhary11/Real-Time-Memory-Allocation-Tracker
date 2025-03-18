@@ -1,0 +1,110 @@
+--------------------------
+Git Basic Commands
+--------------------------
+
+1. Repository Initialization & Cloning
+----------------------------------------
+- Initialize a new Git repository:
+    git init
+  (Creates a new local Git repository in the current directory.)
+
+- Clone an existing repository:
+    git clone <repository_url>
+  (Downloads a repository from a remote source to your local machine.)
+
+----------------------------------------
+
+2. Checking Status & Viewing History
+--------------------------------------
+- Check the status of your repository:
+    git status
+  (Displays the current state of the working directory and staging area.)
+
+- View commit history:
+    git log
+  (Shows the commit history with commit IDs, author information, dates, and commit messages.)
+
+- View changes (diffs) between commits or the working directory and the staging area:
+    git diff
+  (Displays the differences between files or commits.)
+
+----------------------------------------
+
+3. Staging & Committing Changes
+-------------------------------
+- Stage changes for commit:
+    git add <file_name>
+  (Adds a specific file to the staging area.)
+  Alternatively, stage all changes with:
+    git add .
+
+- Commit staged changes:
+    git commit -m "Your commit message"
+  (Commits the staged changes with a descriptive message.)
+
+----------------------------------------
+
+4. Branching & Merging
+----------------------
+- List branches:
+    git branch
+  (Lists all local branches in your repository.)
+
+- Create a new branch:
+    git branch <branch_name>
+  (Creates a new branch with the given name.)
+
+- Switch to a branch:
+    git checkout <branch_name>
+  (Switches your working directory to the specified branch.)
+
+- Create and switch to a new branch in one command:
+    git checkout -b <branch_name>
+  (Creates a new branch and immediately switches to it.)
+
+- Merge another branch into the current branch:
+    git merge <branch_name>
+  (Merges the specified branch into your current branch.)
+
+----------------------------------------
+
+5. Pushing & Pulling Changes
+-----------------------------
+- Push local commits to a remote repository:
+    git push <remote_name> <branch_name>
+  (Sends your committed changes to the remote repository, often "origin".)
+
+- Pull changes from a remote repository:
+    git pull <remote_name> <branch_name>
+  (Fetches and merges changes from the remote repository into your current branch.)
+
+----------------------------------------
+
+6. Remote Management
+--------------------
+- View remote repositories:
+    git remote -v
+  (Lists the remote repositories linked to your project.)
+
+- Add a new remote repository:
+    git remote add <name> <repository_url>
+  (Links a new remote repository to your local project.)
+
+----------------------------------------
+
+Additional Tips
+---------------
+- Undoing changes:
+  - Unstage a file:
+      git reset HEAD <file_name>
+  - Discard local changes in a file:
+      git checkout -- <file_name>
+
+- Creating Tags for Releases:
+    git tag -a v1.0 -m "Version 1.0"
+    git push origin v1.0
+  (Tags a commit with a version label and pushes it to the remote repository.)
+
+--------------------------
+End of Git Basic Commands
+--------------------------
