@@ -1,0 +1,7 @@
+Real-Time-Memory-Allocation/
+    src/
+        MemoryAllocator.h
+        FirstFitAllocator.h
+        TaskSimulator.h
+        main.cpp
+    CMakeLists.txt   (optional)
