@@ -1,0 +1,31 @@
+memory_tracker/
+├── README.md
+├── requirements.txt
+├── setup.py
+├── memory_tracker/
+│   ├── __init__.py
+│   ├── core/
+│   │   ├── __init__.py
+│   │   ├── tracker.py
+│   │   ├── interceptor.py
+│   │   └── snapshot.py
+│   ├── analysis/
+│   │   ├── __init__.py
+│   │   ├── analyzer.py
+│   │   ├── leak_detector.py
+│   │   └── pattern_analyzer.py
+│   ├── visualization/
+│   │   ├── __init__.py
+│   │   ├── dashboard.py
+│   │   ├── timeline.py
+│   │   └── treemap.py
+│   ├── database/
+│   │   ├── __init__.py
+│   │   └── storage.py
+│   └── utils/
+│       ├── __init__.py
+│       └── helpers.py
+└── examples/
+    ├── simple_example.py
+    ├── memory_leak_example.py
+    └── multi_threaded_example.py
