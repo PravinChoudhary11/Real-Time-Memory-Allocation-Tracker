@@ -12,7 +12,7 @@ A comprehensive tool for monitoring, analyzing, and visualizing memory usage in 
 - Low-overhead profiling suitable for production use
 
 ## Installation
-
+ 
 ```bash
 pip install -e .
 ```
