@@ -1,25 +1,30 @@
-from setuptools import setup, find_packages
+# main.py
 
-setup(
-    name="memory-tracker",
-    version="0.1.0",
-    packages=find_packages(),
-    install_requires=[
-        
-        "pympler",
-        "objgraph",
-        "psutil",
-        "pandas",
-        "numpy",
-        "scikit-learn",
-        "dash",
-        "plotly",
-        "matplotlib",
-        "networkx",
-    ],
-    author="Your Name",
-    author_email="your.email@example.com",
-    description="Real-Time Memory Allocation Tracker for Python applications",
-    keywords="memory, profiling, tracking, debugging",
-    python_requires=">=3.8",
-)
+import tkinter as tk
+from gui import MemoryVisualizerGUI
+
+def main():
+    """
+    Main entry point for the memory visualization application.
+    Initializes the Tkinter root window and creates the GUI.
+    """
+    root = tk.Tk()
+    app = MemoryVisualizerGUI(root)
+    root.protocol("WM_DELETE_WINDOW", on_close)
+    root.mainloop()
+
+def on_close():
+    """
+    Handle the window close event.
+    """
+    # Clean up resources
+    import matplotlib.pyplot as plt
+    
+    plt.close('all')
+    
+    # Exit the application
+    import sys
+    sys.exit(0)
+
+if __name__ == "__main__":
+    main()
