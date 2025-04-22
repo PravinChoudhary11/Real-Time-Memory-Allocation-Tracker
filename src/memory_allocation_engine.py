@@ -71,11 +71,19 @@ class MemoryManager:
         return True
     
     def _allocate_process_segmentation(self, process_id, size):
+        """
+        Allocate memory for a process using segmentation.
+        This method tries to find a contiguous block of memory large enough to fit the process.
+        """
+        # First fit approach: find the first free block that's large enough
         for i, block in enumerate(self.memory):
             if block['process_id'] is None and block['size'] >= size:
+                # Found a suitable block
                 if block['size'] == size:
+                    # Perfect fit - use the entire block
                     block['process_id'] = process_id
                 else:
+                    # Split the block - create a new free block after the allocated one
                     end_addr = block['start'] + size - 1
                     new_block = {
                         'start': block['start'] + size,
@@ -88,22 +96,26 @@ class MemoryManager:
                     block['process_id'] = process_id
                     self.memory.insert(i + 1, new_block)
                 
+                # Update the page table entries covered by this segment
                 start_page = block['start'] // self.page_size
                 end_page = block['end'] // self.page_size
                 for frame in self.page_table:
                     if start_page <= frame['frame_id'] <= end_page:
                         frame['process_id'] = process_id
                 
+                # Store the allocation information
                 self.allocated_processes[process_id] = {
                     'size': size,
                     'start': block['start'],
                     'end': block['end'],
                     'method': 'segmentation'
                 }
+                
                 self._update_stats()
                 self._log_event(process_id, "Allocation", f"Allocated segment of size {size} at address {block['start']}")
                 return True
         
+        # No suitable block found
         self._log_event(process_id, "Allocation Failed", f"No suitable free block found for size {size}")
         return False
     
@@ -114,35 +126,54 @@ class MemoryManager:
         process_info = self.allocated_processes[process_id]
         
         if process_info['method'] == 'paging':
+            # Deallocate pages for paging
             for frame_id in process_info['frames']:
                 for frame in self.page_table:
                     if frame['frame_id'] == frame_id:
                         frame['process_id'] = None
             self._update_memory_from_page_table()
         else:
+            # Deallocate segment for segmentation
             for block in self.memory:
                 if block['process_id'] == process_id:
                     block['process_id'] = None
+                    # Also update the page table to reflect the change
                     start_page = block['start'] // self.page_size
                     end_page = block['end'] // self.page_size
                     for frame in self.page_table:
                         if start_page <= frame['frame_id'] <= end_page:
                             frame['process_id'] = None
                     break
+            
+            # Merge adjacent free blocks
             self._merge_free_blocks()
         
+        # Remove process from the allocated list
         del self.allocated_processes[process_id]
         self._update_stats()
         self._log_event(process_id, "Deallocation", "Process removed from memory")
         return True
     
     def _update_memory_from_page_table(self):
+        """
+        Update memory representation from page table.
+        Only used when in paging mode to keep memory map in sync.
+        """
+        # If we're using segmentation, memory blocks are already managed directly
+        if any(proc['method'] == 'segmentation' for proc in self.allocated_processes.values()):
+            return
+        
+        # For paging, rebuild memory blocks from page table
         self.memory = []
         current_block = None
+        
+        # Process frames in order
         for frame in sorted(self.page_table, key=lambda x: x['frame_id']):
             start_addr = frame['start_address']
             end_addr = frame['end_address']
             process_id = frame['process_id']
+            
+            # Start a new block if necessary
             if current_block is None or current_block['process_id'] != process_id:
                 if current_block is not None:
                     self.memory.append(current_block)
@@ -153,15 +184,23 @@ class MemoryManager:
                     'process_id': process_id
                 }
             else:
+                # Extend current block
                 current_block['end'] = end_addr
                 current_block['size'] = current_block['end'] - current_block['start'] + 1
+        
+        # Add the last block
         if current_block is not None:
             self.memory.append(current_block)
     
     def _merge_free_blocks(self):
+        """
+        Merge adjacent free memory blocks.
+        Used after deallocation to prevent fragmentation.
+        """
         i = 0
         while i < len(self.memory) - 1:
             if self.memory[i]['process_id'] is None and self.memory[i+1]['process_id'] is None:
+                # Merge with next block
                 self.memory[i]['end'] = self.memory[i+1]['end']
                 self.memory[i]['size'] += self.memory[i+1]['size']
                 self.memory.pop(i+1)
@@ -169,32 +208,43 @@ class MemoryManager:
                 i += 1
     
     def _update_stats(self):
+        """
+        Update memory usage statistics.
+        """
+        # Calculate used and free memory
         used_memory = sum(block['size'] for block in self.memory if block['process_id'] is not None)
         free_memory = self.memory_size - used_memory
+        
+        # Calculate external fragmentation
         free_blocks = [block for block in self.memory if block['process_id'] is None]
         largest_free_block = max([block['size'] for block in free_blocks], default=0)
         external_fragmentation = 0
         if free_memory > 0:
             external_fragmentation = 1 - (largest_free_block / free_memory)
         
+        # Calculate internal fragmentation (only applies to paging)
         internal_fragmentation = 0
         for process_id, info in self.allocated_processes.items():
             if info['method'] == 'paging':
                 allocated_size = len(info['frames']) * self.page_size
                 internal_fragmentation += allocated_size - info['size']
         
+        # Update stats dictionary
         self.stats = {
             'total_memory': self.memory_size,
             'used_memory': used_memory,
             'free_memory': free_memory,
             'used_percentage': (used_memory / self.memory_size) * 100 if self.memory_size > 0 else 0,
             'process_count': len(self.allocated_processes),
-            'page_faults': 0,
+            'page_faults': 0,  # Could implement if you track page faults
             'external_fragmentation': external_fragmentation,
             'internal_fragmentation': internal_fragmentation
         }
     
     def _log_event(self, process_id, event_type, details):
+        """
+        Log a memory event.
+        """
         event = {
             'timestamp': time.time(),
             'process_id': process_id,
@@ -218,4 +268,3 @@ class ProcessGenerator:
         self.next_pid += 1
         size = random.randint(self.min_size, self.max_size)
         return process_id, size
-    

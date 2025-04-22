@@ -154,7 +154,7 @@ class MemoryVisualizerGUI:
         process_size_entry.grid(row=0, column=1, padx=5, pady=8, sticky="w")
         
         ttk.Label(process_grid, text="Process Lifetime (s):").grid(row=1, column=0, padx=5, pady=8, sticky="w")
-        self.process_lifetime_var = tk.StringVar(value="10")
+        self.process_lifetime_var = tk.StringVar(value="20")
         process_lifetime_entry = ttk.Entry(process_grid, width=10, textvariable=self.process_lifetime_var)
         process_lifetime_entry.grid(row=1, column=1, padx=5, pady=8, sticky="w")
         
@@ -179,9 +179,17 @@ class MemoryVisualizerGUI:
         vis_frame = ttk.LabelFrame(self.main_frame, text="Memory Visualization")
         vis_frame.grid(row=1, column=1, sticky="nsew", padx=(0, 0), pady=(0, 15))
         
-        self.canvas = FigureCanvasTkAgg(self.visualizer.get_figure(), master=vis_frame)
+        # Create a container frame with padding
+        container = ttk.Frame(vis_frame)
+        container.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)  # Increased padding
+        
+        # Create the canvas with increased dimensions
+        self.canvas = FigureCanvasTkAgg(self.visualizer.get_figure(), master=container)
         self.canvas.draw()
-        self.canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        self.canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+        
+        # Configure the figure for better layout
+        self.visualizer.fig.tight_layout(pad=4.0)  # Increased padding in figure
     
     def _create_log_panel(self):
         log_frame = ttk.LabelFrame(self.main_frame, text="Event Log")
